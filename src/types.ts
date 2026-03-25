@@ -9,6 +9,22 @@ export type Specs = {
     freeRDP3Installed: boolean;
 };
 
+export type AndroidInstance = {
+    id: string;
+    name: string;
+    width: number;
+    height: number;
+    dpi: number;
+    fps: number;
+    cpuCores: number;
+    ramGB: number;
+    gpuDevice: string;
+    isRoot: boolean;
+    status: "running" | "stopped" | "starting";
+    adbPort: number;
+    vncPort: number;
+};
+
 export type InstallConfiguration = {
     windowsVersion: WindowsVersionKey;
     windowsLanguage: string;

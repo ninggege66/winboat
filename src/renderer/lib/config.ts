@@ -1,6 +1,6 @@
 const fs: typeof import("fs") = require("node:fs");
 const path: typeof import("path") = require("node:path");
-import { type WinApp } from "../../types";
+import { type WinApp, type AndroidInstance } from "../../types";
 import { WINBOAT_DIR } from "./constants";
 import { type PTSerializableDeviceInfo } from "./usbmanager";
 import { ContainerRuntimes } from "./containers/common";
@@ -73,6 +73,8 @@ export type WinboatConfigObj = {
     versionData: WinboatVersionData;
     appsSortOrder: string;
     gpuDevice: string;
+    androidInstances: AndroidInstance[];
+    installFolder?: string;
 };
 
 const currentVersion = new WinboatVersion(import.meta.env.VITE_APP_VERSION);
@@ -98,6 +100,7 @@ const defaultConfig: WinboatConfigObj = {
     },
     appsSortOrder: 'name',
     gpuDevice: 'disabled',
+    androidInstances: [],
 };
 
 export class WinboatConfig {
