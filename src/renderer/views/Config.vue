@@ -342,6 +342,15 @@
                     v-model:value="wbConfig.config.scale"
                 />
 
+                <!-- Fullscreen Toggle -->
+                <ConfigCard
+                    icon="mdi:fullscreen"
+                    title="全屏模式"
+                    desc="控制 Windows 桌面是否以全屏方式启动。禁用后将以窗口模式启动并支持动态调整分辨率。"
+                    type="switch"
+                    v-model:value="wbConfig.config.fullscreen"
+                />
+
                 <!-- Application Scaling -->
                 <ConfigCard
                     class="relative z-20"

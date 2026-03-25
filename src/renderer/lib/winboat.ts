@@ -78,6 +78,8 @@ const stockArgs = [
     "/floatbar",
     "/compression",
     "/sec:tls",
+    "+dynamic-resolution",
+    "/smart-sizing",
 ];
 
 /**
@@ -338,7 +340,6 @@ export class Winboat {
 
             // If RDP monitoring is disabled, don't check status, just set it to false
             if (!this.#wbConfig?.config.rdpMonitoringEnabled) {
-                this.rdpConnected.value = false;
                 return;
             }
 
@@ -664,7 +665,7 @@ export class Winboat {
 
         if (app.Path == InternalApps.WINDOWS_DESKTOP) {
             args = args.concat([
-                "+f",
+                this.#wbConfig?.config.fullscreen ? "+f" : "",
                 this.#wbConfig?.config.smartcardEnabled ? "/smartcard" : "",
                 `/scale:${freerdpScale}`,
                 `/scale-desktop:${scale}`,
