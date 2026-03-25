@@ -10,7 +10,28 @@
             <a @click="openAnchorLink" href="https://github.com/TibixDev/WinBoat">开源软件</a>
         </p>
         <p class="text-gray-400 !mt-0">Copyright (c) 2026 TibixDev</p>
-        <p class="text-sm text-gray-500 text-center !mt-16 w-[40vw]">
+        <div class="p-6 my-8 bg-white/5 rounded-2xl border border-white/10 w-[440px] backdrop-blur-md">
+            <h3 class="mt-0 mb-4 text-base font-semibold flex items-center gap-2 text-white">
+                <Icon icon="mdi:keyboard-outline" class="size-5" />
+                虚拟机快捷键指南
+            </h3>
+            <div class="space-y-3 text-[0.85rem] text-gray-400">
+                <div class="flex justify-between items-center">
+                    <span>释放鼠标/键盘捕获</span>
+                    <kbd class="bg-neutral-700 px-1.5 py-0.5 rounded font-mono text-white text-[0.7rem] border border-white/10 shadow-sm">右 Ctrl</kbd>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>切换全屏模式</span>
+                    <kbd class="bg-neutral-700 px-1.5 py-0.5 rounded font-mono text-white text-[0.7rem] border border-white/10 shadow-sm">Ctrl + Alt + Enter</kbd>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>最小化虚拟机窗口</span>
+                    <kbd class="bg-neutral-700 px-1.5 py-0.5 rounded font-mono text-white text-[0.7rem] border border-white/10 shadow-sm">Ctrl + Alt + M</kbd>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-sm text-gray-500 text-center w-[40vw]">
             WinBoat 与微软公司（Microsoft Corporation）无任何关联，亦未获得其背书或赞助。“Windows”是微软公司的注册商标，所有相关资产（图标、徽标等）均归微软所有。
         </p>
     </div>
