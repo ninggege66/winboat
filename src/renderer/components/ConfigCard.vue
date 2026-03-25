@@ -46,7 +46,7 @@
             <template v-else-if="props.type === 'dropdown'">
                 <x-select
                     class="w-20"
-                    @change="(e: any) => (value = e.detail.newValue)"
+                    @change="(e: any) => (value = Number(e.detail.newValue))"
                 >
                     <x-menu>
                         <x-menuitem v-for="(opt, key) in props.options" :value="opt" :key="key" :toggled="value === opt">

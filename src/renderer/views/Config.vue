@@ -1,13 +1,13 @@
 <template>
     <div class="flex flex-col gap-10 overflow-x-hidden" :class="{ hidden: !maxNumCores }">
         <div>
-            <x-label class="mb-4 text-neutral-300">Container</x-label>
+            <x-label class="mb-4 text-neutral-300">容器设置</x-label>
             <div class="flex flex-col gap-4">
                 <!-- RAM Allocation -->
                 <ConfigCard
                     icon="game-icons:ram"
-                    title="RAM Allocation"
-                    desc="How many gigabytes of RAM are allocated to the Windows virtual machine"
+                    title="内存分配"
+                    desc="为 Windows 虚拟机分配多少 GB 内存"
                     type="number"
                     unit="GB"
                     :min="2"
@@ -18,10 +18,10 @@
                 <!-- CPU Cores -->
                 <ConfigCard
                     icon="solar:cpu-bold"
-                    title="CPU Cores"
-                    desc="How many CPU Cores are allocated to the Windows virtual machine"
+                    title="CPU 核心"
+                    desc="为 Windows 虚拟机分配多少个 CPU 核心"
                     type="number"
-                    unit="Cores"
+                    unit="核"
                     :min="2"
                     :max="maxNumCores"
                     v-model:value="numCores"
@@ -30,13 +30,14 @@
                 <!-- Shared Folder -->
                 <ConfigCard
                     icon="fluent:folder-link-32-filled"
-                    title="Shared Folder"
+                    title="共享文件夹"
                     type="switch"
                     v-model:value="shareFolder"
                 >
                     <template v-slot:desc>
-                        If enabled, you will be able to access your selected folder within Windows under
+                        如果启用，您可以在 Windows 的
                         <span class="font-mono bg-neutral-700 rounded-md px-1 py-0.5">Network\host.lan</span>
+                        下访问选定的文件夹
                     </template>
                 </ConfigCard>
 
@@ -44,27 +45,27 @@
                 <ConfigCard
                     v-if="shareFolder"
                     icon="mdi:folder-cog"
-                    title="Shared Folder Location"
+                    title="共享文件夹位置"
                     type="custom"
                 >
                     <template v-slot:desc>
                         <span v-if="sharedFolderPath">
-                            Currently sharing: <span class="font-mono bg-neutral-700 rounded-md px-1 py-0.5">{{ sharedFolderPath }}</span>
+                            当前共享：<span class="font-mono bg-neutral-700 rounded-md px-1 py-0.5">{{ sharedFolderPath }}</span>
                         </span>
                         <span v-else>
-                            Select a folder to share with Windows
+                            选择要与 Windows 共享的文件夹
                         </span>
                     </template>
                     <x-button @click="selectSharedFolder">
-                        Browse
+                        浏览
                     </x-button>
                 </ConfigCard>
 
                 <!-- Auto Start Container -->
                 <ConfigCard
                     icon="clarity:power-solid"
-                    title="Auto Start Container"
-                    desc="If enabled, the Windows container will automatically be started when the system boots up"
+                    title="自动启动容器"
+                    desc="如果启用，Windows 容器将在系统启动时自动启动"
                     type="switch"
                     v-model:value="autoStartContainer"
                 />
@@ -72,8 +73,8 @@
                 <!-- FreeRDP Port -->
                 <ConfigCard
                     icon="lucide:ethernet-port"
-                    title="FreeRDP Port"
-                    desc="You can change what port FreeRDP uses to communicate with the VM"
+                    title="FreeRDP 端口"
+                    desc="您可以更改 FreeRDP 与虚拟机通信使用的端口"
                     type="custom"
                 >
                     <x-input
@@ -88,7 +89,7 @@
                             }
                         "
                     >
-                        <x-label v-if="Number.isNaN(freerdpPort)">None</x-label>
+                        <x-label v-if="Number.isNaN(freerdpPort)">无</x-label>
                     </x-input>
                 </ConfigCard>
                 <div class="flex flex-col">
@@ -99,13 +100,13 @@
                     @click="saveCompose()"
                     class="w-24"
                 >
-                    <span v-if="!isApplyingChanges || isUpdatingUSBPrerequisites">Save</span>
+                    <span v-if="!isApplyingChanges || isUpdatingUSBPrerequisites">保存</span>
                     <x-throbber v-else class="w-10"></x-throbber>
                 </x-button>
             </div>
         </div>
         <div v-show="wbConfig.config.experimentalFeatures">
-            <x-label class="mb-4 text-neutral-300">Devices</x-label>
+            <x-label class="mb-4 text-neutral-300">设备透传</x-label>
             <div class="flex flex-col gap-4">
                 <!-- USB Passthrough -->
                 <x-card
@@ -115,8 +116,8 @@
                         <div class="flex flex-row gap-2 items-center mb-2">
                             <Icon class="inline-flex text-violet-400 size-8" icon="fluent:tv-usb-24-filled"></Icon>
                             <h1 class="my-0 text-lg font-semibold">
-                                USB Passthrough
-                                <span class="bg-violet-500 rounded-full px-3 py-0.5 text-sm ml-2"> Experimental </span>
+                                USB 透传
+                                <span class="bg-violet-500 rounded-full px-3 py-0.5 text-sm ml-2"> 实验性 </span>
                             </h1>
                         </div>
 
@@ -126,7 +127,7 @@
                             >
                                 <Icon class="inline-flex text-yellow-500 size-8" icon="clarity:warning-solid"></Icon>
                                 <h1 class="my-0 text-base font-normal text-yellow-200">
-                                    We need to update your Compose in order to use this feature!
+                                    我们需要更新您的 Compose 文件才能使用此功能！
                                 </h1>
 
                                 <x-button
@@ -138,7 +139,7 @@
                                         class="ext-lg font-normal text-yellow-200"
                                         v-if="!isUpdatingUSBPrerequisites"
                                     >
-                                        Update
+                                        更新
                                     </x-label>
 
                                     <x-throbber v-else class="w-8 text-yellow-300"></x-throbber>
@@ -151,7 +152,7 @@
                             >
                                 <Icon class="inline-flex text-yellow-500 size-8" icon="clarity:warning-solid"></Icon>
                                 <h1 class="my-0 text-base font-normal text-yellow-200">
-                                    USB Passthrough is not yet supported while using Podman as the container runtime.
+                                    使用 Podman 作为容器运行时还不支持 USB 透传。
                                 </h1>
                             </x-card>
                         </template>
@@ -166,7 +167,7 @@
                                 class="text-neutral-400 text-[0.9rem] !pt-0 !mt-0"
                                 v-if="usbManager.ptDevices.value.length == 0"
                             >
-                                Press the button below to add USB devices to your passthrough list
+                                点击下方按钮将 USB 设备添加到透传列表
                             </x-label>
                             <TransitionGroup name="devices" tag="x-box" class="flex-col gap-2 mt-4">
                                 <x-card
@@ -196,10 +197,7 @@
                                             <span
                                                 class="absolute bottom-5 z-50 w-[320px] bg-neutral-800/90 backdrop-blur-sm text-xs text-gray-300 rounded-lg shadow-lg px-3 py-2 hidden group-hover:block transition-opacity duration-200 pointer-events-none"
                                             >
-                                                This device appears to be using the MTP protocol, which is known for
-                                                being problematic. Some Desktop Environments automatically mount MTP
-                                                devices, which in turn causes WinBoat to not be able to pass the device
-                                                through.
+                                                此设备似乎正在使用 MTP 协议，已知该协议存在问题。某些桌面环境会自动挂载 MTP 设备，从而导致 WinBoat 无法透传该设备。
                                             </span>
                                         </span>
 
@@ -211,7 +209,7 @@
                                             <span
                                                 class="absolute bottom-5 z-50 w-[320px] bg-neutral-800/90 backdrop-blur-sm text-xs text-gray-300 rounded-lg shadow-lg px-3 py-2 hidden group-hover:block transition-opacity duration-200 pointer-events-none"
                                             >
-                                                This device is currently not connected.
+                                                此设备当前未连接。
                                             </span>
                                         </span>
 
@@ -234,7 +232,7 @@
                                 @click="refreshAvailableDevices()"
                             >
                                 <x-icon href="#add"></x-icon>
-                                <x-label>Add Device</x-label>
+                                <x-label>添加设备</x-label>
                                 <TransitionGroup ref="usbMenu" name="menu" tag="x-menu" class="max-h-52">
                                     <x-menuitem
                                         v-for="(device, k) of availableDevices as Device[]"
@@ -244,7 +242,7 @@
                                         <x-label>{{ usbManager.stringifyDevice(device) }}</x-label>
                                     </x-menuitem>
                                     <x-menuitem v-if="availableDevices.length === 0" disabled>
-                                        <x-label>No available devices</x-label>
+                                        <x-label>无可用设备</x-label>
                                     </x-menuitem>
                                 </TransitionGroup>
                             </x-button>
@@ -254,7 +252,7 @@
             </div>
         </div>
         <div v-show="wbConfig.config.advancedFeatures">
-            <x-label class="mb-4 text-neutral-300">FreeRDP</x-label>
+            <x-label class="mb-4 text-neutral-300">FreeRDP 设置</x-label>
             <div class="flex flex-col gap-4">
                 <!-- RDP args -->
                 <x-card
@@ -264,8 +262,8 @@
                         <div class="flex flex-row gap-2 items-center mb-2">
                             <Icon class="inline-flex text-violet-400 size-8" icon="fluent:tv-24-filled"></Icon>
                             <h1 class="my-0 text-lg font-semibold">
-                                FreeRDP Arguments
-                                <span class="bg-blue-500 rounded-full px-3 py-0.5 text-sm ml-2"> Advanced </span>
+                                FreeRDP 参数
+                                <span class="bg-blue-500 rounded-full px-3 py-0.5 text-sm ml-2"> 高级 </span>
                             </h1>
                         </div>
 
@@ -273,8 +271,7 @@
                             v-if="wbConfig.config.rdpArgs.length == 0"
                             class="text-neutral-400 text-[0.9rem] !pt-0 !mt-0"
                         >
-                            Press the buttons below to add arguments to FreeRDP, you can choose to either add a new
-                            argument or modify an existing one to your liking via replacement
+                            点击下方按钮向 FreeRDP 添加参数。您可以选择添加新参数或通过替换修改现有参数。
                         </x-label>
                         <TransitionGroup name="devices" tag="x-box" class="flex-col gap-2 mt-4">
                             <x-card
@@ -290,7 +287,7 @@
                                         :value="arg.original"
                                         @input="(e: any) => (arg.original = e.target.value)"
                                     >
-                                        <x-label>Original Argument</x-label>
+                                        <x-label>原始参数</x-label>
                                     </x-input>
                                     <x-input
                                         type="text"
@@ -299,7 +296,7 @@
                                         :value="arg.newArg"
                                         @input="(e: any) => (arg.newArg = e.target.value)"
                                     >
-                                        <x-label>New Argument</x-label>
+                                        <x-label>新参数</x-label>
                                     </x-input>
                                 </div>
                                 <x-button
@@ -316,14 +313,14 @@
                                 @click="wbConfig.config.rdpArgs.push({ newArg: '', isReplacement: false })"
                             >
                                 <x-icon href="#add"></x-icon>
-                                <x-label>Add Argument</x-label>
+                                <x-label>添加参数</x-label>
                             </x-button>
                             <x-button
                                 class="!bg-gradient-to-tl from-yellow-400/20 shadow-md shadow-yellow-950/20 to-transparent hover:from-yellow-400/30 transition"
                                 @click="wbConfig.config.rdpArgs.push({ newArg: '', original: '', isReplacement: true })"
                             >
                                 <Icon class="inline-flex size-6" icon="codex:replace" />
-                                <x-label>Replace Argument</x-label>
+                                <x-label>替换参数</x-label>
                             </x-button>
                         </div>
                     </div>
@@ -331,25 +328,26 @@
             </div>
         </div>
         <div>
-            <x-label class="mb-4 text-neutral-300">General</x-label>
+            <x-label class="mb-4 text-neutral-300">通用设置</x-label>
             <div class="flex flex-col gap-4">
                 <!-- Display Scaling -->
                 <ConfigCard
-                    class="relative z-10"
+                    class="relative z-30"
                     icon="uil:scaling-right"
-                    title="Display Scaling"
-                    desc="Controls how large the display scaling is."
+                    title="显示缩放"
+                    desc="控制显示缩放比例。"
                     type="dropdown"
                     unit="%"
-                    :options="[Number(100), 140, 180]"
+                    :options="[100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300]"
                     v-model:value="wbConfig.config.scale"
                 />
 
                 <!-- Application Scaling -->
                 <ConfigCard
+                    class="relative z-20"
                     icon="uil:apps"
-                    title="Application Scaling"
-                    desc="Controls how large the application scaling is.."
+                    title="应用缩放"
+                    desc="控制应用界面的缩放比例。"
                     type="number"
                     :step="10"
                     :min="100"
@@ -361,23 +359,21 @@
                 <ConfigCard
                     class="relative z-10"
                     icon="uil:monitor"
-                    title="Multi-Monitor Support"
+                    title="多显示器支持"
                     type="dropdown"
                     :options="Object.values(MultiMonitorMode)"
                     v-model:value="wbConfig.config.multiMonitor"
                 >
                     <template v-slot:desc>
-                        Controls how multiple monitors are handled. MultiMon creates separate displays for each
-                        monitor, while Span stretches the display across all monitors. Note: Span or MultiMon may
-                        work better depending on your setup.
+                        控制如何处理多显示器。MultiMon 为每个显示器创建单独的显示，而 Span 将显示拉伸到所有显示器。注意：根据您的设置，Span 或 MultiMon 的效果可能更好。
                     </template>
                 </ConfigCard>
 
                 <!-- Smartcard Passthrough -->
                 <ConfigCard
                     icon="game-icons:swipe-card"
-                    title="Smartcard Passthrough"
-                    desc="If enabled, your smartcard readers will be passed to Windows when you start an app"
+                    title="智能卡透传"
+                    desc="如果启用，在启动应用时您的智能卡读取器将透传给 Windows"
                     type="switch"
                     v-model:value="wbConfig.config.smartcardEnabled"
                 >
@@ -386,8 +382,8 @@
                 <!-- RDP Monitoring -->
                 <ConfigCard
                     icon="fluent:remote-16-filled"
-                    title="RDP Monitoring"
-                    desc="If enabled, a banner will appear when the RDP session is connected (may cause high CPU usage, disable if you notice performance issues)"
+                    title="RDP 监控"
+                    desc="如果启用，当 RDP 会话连接时将显示横幅（可能会导致 CPU 占用较高，如果发现性能问题请禁用）"
                     type="switch"
                     v-model:value="wbConfig.config.rdpMonitoringEnabled"
                 />
@@ -395,14 +391,14 @@
         </div>
 
         <div>
-            <x-label class="mb-4 text-neutral-300">WinBoat</x-label>
+            <x-label class="mb-4 text-neutral-300">WinBoat 设置</x-label>
 
             <div class="flex flex-col gap-4">
                 <!-- Experimental Features -->
                 <ConfigCard
                     icon="streamline-ultimate:lab-tube-experiment"
-                    title="Experimental Features"
-                    desc="If enabled, you'll have access to experimental features that may not be stable or complete"
+                    title="实验性功能"
+                    desc="如果启用，您将可以使用可能不稳定或不完整的实验性功能"
                     type="switch"
                     v-model:value="wbConfig.config.experimentalFeatures"
                     @toggle="toggleExperimentalFeatures"
@@ -411,8 +407,8 @@
                 <!-- Advanced Settings -->
                 <ConfigCard
                     icon="mdi:administrator"
-                    title="Advanced Settings"
-                    desc="If enabled, you'll have access to advanced settings that may prevent WinBoat from working if misconfigured"
+                    title="高级设置"
+                    desc="如果启用，您将可以使用如果配置错误可能会导致 WinBoat 无法工作的高级设置"
                     type="switch"
                     v-model:value="wbConfig.config.advancedFeatures"
                 />
@@ -420,8 +416,8 @@
                 <!-- Disable Animations -->
                 <ConfigCard
                     icon="mdi:animation-outline"
-                    title="Disable Animations"
-                    desc="If enabled, all animations in the UI will be disabled (useful when GPU acceleration isn't working well)"
+                    title="禁用动画"
+                    desc="如果启用，UI 中的所有动画都将被禁用（当 GPU 加速工作不佳时非常有用）"
                     type="switch"
                     v-model:value="wbConfig.config.disableAnimations"
                 />
@@ -429,11 +425,10 @@
         </div>
 
         <div>
-            <x-label class="mb-4 text-neutral-300">Danger Zone</x-label>
+            <x-label class="mb-4 text-neutral-300">危险区域</x-label>
             <x-card class="flex flex-col py-3 my-0 mb-6 w-full backdrop-blur-xl backdrop-brightness-150 bg-red-500/10">
                 <h1 class="my-0 text-lg font-normal text-red-300">
-                    ⚠️ <span class="font-bold">WARNING:</span> All actions here are potentially destructive, proceed at
-                    your own caution!
+                    ⚠️ <span class="font-bold">警告：</span> 此处的所有操作都具有潜在的破坏性，请谨慎操作！
                 </h1>
             </x-card>
             <div></div>
@@ -445,10 +440,10 @@
                 <Icon v-if="resetQuestionCounter < 3" icon="mdi:bomb" class="size-8"></Icon>
                 <x-throbber v-else class="size-8"></x-throbber>
 
-                <span v-if="resetQuestionCounter === 0">Reset Winboat & Remove VM</span>
-                <span v-else-if="resetQuestionCounter === 1">Are you sure? This action cannot be undone.</span>
-                <span v-else-if="resetQuestionCounter === 2">One final check, are you ABSOLUTELY sure?</span>
-                <span v-else-if="resetQuestionCounter === 3">Resetting Winboat...</span>
+                <span v-if="resetQuestionCounter === 0">重置 Winboat 并删除虚拟机</span>
+                <span v-else-if="resetQuestionCounter === 1">您确定吗？此操作无法撤销。</span>
+                <span v-else-if="resetQuestionCounter === 2">最后确认，您“绝对”确定吗？</span>
+                <span v-else-if="resetQuestionCounter === 3">正在重置 Winboat...</span>
             </x-button>
         </div>
     </div>
@@ -615,7 +610,7 @@ async function saveCompose() {
 function selectSharedFolder() {
     electron.dialog
         .showOpenDialog({
-            title: "Select Folder to Share",
+            title: "选择要共享的文件夹",
             properties: ["openDirectory"],
             defaultPath: sharedFolderPath.value || os.homedir(),
         })
@@ -680,19 +675,19 @@ const errors = computedAsync(async () => {
     let errCollection: string[] = [];
 
     if (!numCores.value || numCores.value < 2) {
-        errCollection.push("You must allocate at least two CPU cores for Windows to run properly");
+        errCollection.push("您必须为 Windows 分配至少两个 CPU 核心才能正常运行");
     }
 
     if (numCores.value > maxNumCores.value) {
-        errCollection.push("You cannot allocate more CPU cores to Windows than you have available");
+        errCollection.push("分配给 Windows 的 CPU 核心不能超过可用数量");
     }
 
     if (!ramGB.value || ramGB.value < 4) {
-        errCollection.push("You must allocate at least 4 GB of RAM for Windows to run properly");
+        errCollection.push("您必须为 Windows 分配至少 4 GB 内存才能正常运行");
     }
 
     if (ramGB.value > maxRamGB.value) {
-        errCollection.push("You cannot allocate more RAM to Windows than you have available");
+        errCollection.push("分配给 Windows 的 内存不能超过可用容量");
     }
 
     if (
@@ -700,7 +695,7 @@ const errors = computedAsync(async () => {
         !Number.isNaN(freerdpPort.value) &&
         !(await ComposePortMapper.isPortOpen(freerdpPort.value))
     ) {
-        errCollection.push("You must choose an open port for your FreeRDP port!");
+        errCollection.push("您必须为 FreeRDP 选择一个开放端口！");
     }
 
     return errCollection;

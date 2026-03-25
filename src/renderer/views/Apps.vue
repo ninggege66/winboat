@@ -1,7 +1,7 @@
 <template>
     <div>
         <dialog ref="addCustomAppDialog">
-            <h3 class="mb-2">{{ currentAppForm.Source === "custom" ? "Edit App" : "Add App" }}</h3>
+            <h3 class="mb-2">{{ currentAppForm.Source === "custom" ? "编辑应用" : "添加应用" }}</h3>
             <div class="flex flex-row gap-5 mt-4 w-[35vw]">
                 <div class="flex flex-col flex-none gap-2 justify-center items-center">
                     <div class="relative">
@@ -17,13 +17,13 @@
                             class="flex absolute top-0 left-0 flex-col gap-1 justify-center items-center w-full h-full rounded-xl opacity-0 backdrop-blur-sm transition duration-200 absoute bg-black/50 hover:opacity-100"
                         >
                             <Icon icon="mdi:pencil" class="size-10"></Icon>
-                            <x-label>Change Icon</x-label>
+                            <x-label>更改图标</x-label>
                         </button>
                     </div>
                 </div>
                 <div class="flex flex-col gap-0.5 justify-center w-full">
                     <!-- Name field -->
-                    <x-label>Name</x-label>
+                    <x-label>名称</x-label>
                     <x-input
                         v-model="currentAppForm.Name"
                         class="!max-w-full"
@@ -32,7 +32,7 @@
                     />
 
                     <!-- Path field -->
-                    <x-label class="mt-4">Path</x-label>
+                    <x-label class="mt-4">路径</x-label>
                     <x-input
                         v-model="currentAppForm.Path"
                         type="text"
@@ -41,8 +41,8 @@
                     />
 
                     <!-- Arguments field -->
-                    <x-label class="mt-2">Arguments</x-label>
-                    <x-input v-model="currentAppForm.Args" type="text" class="!max-w-full" placeholder="Optional" />
+                    <x-label class="mt-2">参数</x-label>
+                    <x-input v-model="currentAppForm.Args" type="text" class="!max-w-full" placeholder="可选" />
                 </div>
             </div>
 
@@ -50,14 +50,13 @@
                 <div class="flex flex-row gap-2 items-center my-0 font-semibold text-blue-400">
                     <Icon icon="fluent:info-32-filled" class="inline size-4"></Icon>
                     <p class="!my-0 break-normal max-w-[30vw]">
-                        Please make sure the path you enter is a valid path to an executable file, otherwise the app
-                        will not work.
+                        请确保您输入的路径是有效的可执行文件路径，否则应用将无法工作。
                     </p>
                 </div>
                 <div class="flex flex-row gap-2 items-center my-0 font-semibold text-blue-400">
                     <Icon icon="fluent:info-32-filled" class="inline size-4"></Icon>
                     <p class="!my-0 break-normal max-w-[30vw]">
-                        Custom apps can be removed by right clicking on them and selecting "Remove Custom App".
+                        右键点击自定义应用并选择“删除自定义应用”即可将其删除。
                     </p>
                 </div>
                 <div
@@ -84,7 +83,7 @@
             </template>
             <footer>
                 <x-button @click="cancelAddCustomApp" id="cancel-button">
-                    <x-label>Cancel</x-label>
+                    <x-label>取消</x-label>
                 </x-button>
                 <x-button
                     toggled
@@ -92,7 +91,7 @@
                     :disabled="customAppAddErrors.length > 0 || (orginalAppForm?.Source === 'custom' && isSame)"
                     @click="saveApp"
                 >
-                    <x-label>{{ currentAppForm.Source === "custom" ? "Save" : "Create New" }}</x-label>
+                    <x-label>{{ currentAppForm.Source === "custom" ? "保存" : "新建" }}</x-label>
                 </x-button>
             </footer>
         </dialog>
@@ -104,18 +103,18 @@
                     winboat.containerStatus.value !== ContainerStatus.RUNNING || !winboat.isOnline.value,
             }"
         >
-            <x-label class="text-neutral-300">Apps</x-label>
+            <x-label class="text-neutral-300">应用列表</x-label>
             <div class="flex flex-row gap-2 justify-center items-center">
                 <!-- Refresh button -->
                 <x-button class="flex flex-row gap-1 items-center" @click="refreshApps">
                     <Icon icon="mdi:refresh" class="size-4"></Icon>
-                    <x-label>Refresh</x-label>
+                    <x-label>刷新</x-label>
                 </x-button>
 
                 <!-- Custom App Add Button -->
                 <x-button class="flex flex-row gap-1 items-center" @click="openAddAppDialog()">
                     <x-icon href="#add" class="qualifier"></x-icon>
-                    <x-label class="qualifier">Add Custom</x-label>
+                    <x-label class="qualifier">添加自定义</x-label>
                 </x-button>
                 <x-select
                     @change="
@@ -130,15 +129,15 @@
                         <x-menuitem value="name" :toggled="sortBy === 'name'">
                             <x-icon href="#sort" class="qualifier"></x-icon>
                             <x-label>
-                                <span class="qualifier"> Sort By: </span>
-                                Name
+                                <span class="qualifier"> 排序方式： </span>
+                                名称
                             </x-label>
                         </x-menuitem>
                         <x-menuitem value="usage" :toggled="sortBy === 'usage'">
                             <x-icon href="#sort" class="qualifier"></x-icon>
                             <x-label>
-                                <span class="qualifier"> Sort By: </span>
-                                Usage
+                                <span class="qualifier"> 排序方式： </span>
+                                使用频率
                             </x-label>
                         </x-menuitem>
                     </x-menu>
@@ -152,14 +151,14 @@
                     <x-menu class="">
                         <x-menuitem value="all" toggled>
                             <x-label>
-                                <span class="qualifier"> Filter: </span>
-                                All
+                                <span class="qualifier"> 筛选： </span>
+                                全部
                             </x-label>
                         </x-menuitem>
 
                         <x-menuitem v-for="(label, value) in AllSources" :value="value">
                             <x-label>
-                                <span class="qualifier"> Filter: </span>
+                                <span class="qualifier"> 筛选： </span>
                                 {{ label }}
                             </x-label>
                         </x-menuitem>
@@ -177,7 +176,7 @@
                     :disabled="!winboat.isOnline.value"
                 >
                     <x-icon href="#search"></x-icon>
-                    <x-label>Search</x-label>
+                    <x-label>搜索</x-label>
                 </x-input>
             </div>
         </div>
@@ -216,17 +215,17 @@
             <WBContextMenu key="contextMenu" ref="contextMenuRef" @hide="onContextMenuHide">
                 <WBMenuItem @click="launchApp">
                     <Icon class="size-4" icon="mdi:play-circle-outline"></Icon>
-                    <x-label>Launch</x-label>
+                    <x-label>启动</x-label>
                 </WBMenuItem>
 
                 <WBMenuItem @click="contextMenuTarget && openEditAppDialog(contextMenuTarget)">
                     <Icon class="size-4" icon="mdi:pencil-outline"></Icon>
-                    <x-label>Edit</x-label>
+                    <x-label>编辑</x-label>
                 </WBMenuItem>
 
                 <WBMenuItem v-if="contextMenuTarget?.Source === 'custom'" @click="removeCustomApp">
                     <Icon class="size-4" icon="mdi:trash-can-outline"></Icon>
-                    <x-label>Remove</x-label>
+                    <x-label>删除</x-label>
                 </WBMenuItem>
             </WBContextMenu>
         </div>
@@ -240,11 +239,10 @@
                             winboat.containerStatus.value === ContainerStatus.UNKNOWN
                         "
                     >
-                        The WinBoat Container is not running, please start it to view your apps list.
+                        WinBoat 容器未运行，请启动容器以查看应用列表。
                     </span>
                     <span v-else>
-                        The WinBoat Guest API is not running, please restart the container. If this problem persists,
-                        contact customer support.
+                        WinBoat 客户端 API 未运行，请重启容器。如果问题仍然存在，请联系客户支持。
                     </span>
                 </h1>
             </div>
@@ -289,11 +287,11 @@ const currentAppForm = ref<WinApp>({
 const AllSources = computed(() => {
     let sourceList: Record<string, string> = {};
     const sourceMap: Record<string, string> = {
-        system: "System",
-        winreg: "Windows Registry",
-        startmenu: "Start Menu",
+        system: "系统",
+        winreg: "Windows 注册表",
+        startmenu: "开始菜单",
         uwp: "Microsoft Store",
-        internal: "Internal",
+        internal: "内部",
     };
 
     for (const app of apps.value) {
@@ -383,21 +381,21 @@ const customAppAddErrors = computed(() => {
     const errors: string[] = [];
 
     if (!customAppName.value) {
-        errors.push("A valid name is required for your app");
+        errors.push("应用名称不能为空");
     }
 
     if (apps.value.some(app => app.Name === customAppName.value) && orginalAppForm.value) {
         if (orginalAppForm.value.Name !== customAppName.value || orginalAppForm.value.Source !== "custom") {
-            errors.push("An app with this name already exists");
+            errors.push("已存在同名应用");
         }
     }
 
     if (!customAppPath.value) {
-        errors.push("A valid path is required for your app");
+        errors.push("应用路径不能为空");
     }
 
     if (!customAppIcon.value) {
-        errors.push("A valid icon is required for your app");
+        errors.push("应用图标不能为空");
     }
 
     return errors;

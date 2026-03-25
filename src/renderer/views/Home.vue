@@ -25,11 +25,11 @@
                     >
                         <Icon class="size-7" icon="material-symbols:api"></Icon>
                         <p class="!my-0 font-semibold text-lg">
-                            WinBoat Guest API -
-                            {{ winboat.isOnline.value ? "Online" : "Offline" }}
+                            WinBoat 访客 API -
+                            {{ winboat.isOnline.value ? "在线" : "离线" }}
                             <a
                                 v-if="!winboat.isOnline.value"
-                                title="Get Help"
+                                title="获取帮助"
                                 href="https://rentry.org/winboat_guest_server_borked"
                                 @click="openAnchorLink"
                                 class="text-red-400 hover:text-red-500 hover:underline inline-flex translate-y-1 transition"
@@ -51,7 +51,7 @@
                     >
                         <Icon class="size-7 scale-90" icon="octicon:container-16"></Icon>
                         <p class="!my-0 font-semibold text-lg">
-                            Container - {{ capitalizeFirstLetter(winboat.containerStatus.value) }}
+                            容器状态 - {{ STATUS_MAP[winboat.containerStatus.value] ?? winboat.containerStatus.value }}
                         </p>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
             <!-- Buttons -->
             <div v-if="!winboat.containerActionLoading.value" class="flex flex-row items-center gap-5 text-gray-200/80">
                 <button
-                    title="Start"
+                    title="启动"
                     class="generic-hover"
                     v-if="
                         winboat.containerStatus.value === ContainerStatus.EXITED ||
@@ -72,7 +72,7 @@
                     <Icon class="w-20 h-20 text-green-300" icon="mingcute:play-fill"></Icon>
                 </button>
                 <button
-                    title="Stop"
+                    title="停止"
                     class="generic-hover"
                     v-if="winboat.containerStatus.value === ContainerStatus.RUNNING"
                     @click="winboat.stopContainer()"
@@ -80,7 +80,7 @@
                     <Icon class="w-20 h-20 text-red-300" icon="mingcute:stop-fill"></Icon>
                 </button>
                 <button
-                    title="Restart"
+                    title="重启"
                     class="generic-hover"
                     v-if="winboat.containerStatus.value === ContainerStatus.RUNNING"
                     @click="winboat.restartContainer()"
@@ -89,7 +89,7 @@
                 </button>
 
                 <button
-                    title="Pause / Unpause"
+                    title="暂停 / 恢复"
                     class="generic-hover"
                     v-if="
                         winboat.containerStatus.value === ContainerStatus.RUNNING ||
@@ -130,10 +130,10 @@
                         <h2 class="my-0 text-2xl">CPU</h2>
                     </div>
                     <p class="!my-0 text-gray-400 h-6 overflow-hidden">
-                        {{ compose?.services.windows.environment.CPU_CORES }} Virtual Cores
+                        {{ compose?.services.windows.environment.CPU_CORES }} 核虚拟核心
                     </p>
                     <p class="!my-0 text-gray-400 h-6 overflow-hidden">
-                        Frequency: {{ (winboat.metrics.value.cpu.frequency / 1000).toFixed(2) }} GHz
+                        主频: {{ (winboat.metrics.value.cpu.frequency / 1000).toFixed(2) }} GHz
                     </p>
                 </div>
             </x-card>
@@ -149,13 +149,13 @@
                 <div>
                     <div class="flex flex-row gap-2 items-center mb-2">
                         <Icon class="size-8 text-violet-400" icon="game-icons:ram"></Icon>
-                        <h2 class="my-0 text-2xl">RAM</h2>
+                        <h2 class="my-0 text-2xl">内存</h2>
                     </div>
                     <p class="!my-0 text-gray-400 h-6 overflow-hidden">
-                        {{ Math.round(winboat.metrics.value.ram.total / 1024).toFixed(2) }} GB Total RAM
+                        内存总量 {{ Math.round(winboat.metrics.value.ram.total / 1024).toFixed(2) }} GB
                     </p>
                     <p class="!my-0 text-gray-400 h-6 overflow-hidden">
-                        {{ (winboat.metrics.value.ram.used / 1024).toFixed(2) }} GB Used RAM
+                        已用内存 {{ (winboat.metrics.value.ram.used / 1024).toFixed(2) }} GB
                     </p>
                 </div>
             </x-card>
@@ -171,13 +171,13 @@
                 <div>
                     <div class="flex flex-row gap-2 items-center mb-2">
                         <Icon class="size-8 text-violet-400" icon="carbon:vmdk-disk"></Icon>
-                        <h2 class="my-0 text-2xl">Disk</h2>
+                        <h2 class="my-0 text-2xl">磁盘</h2>
                     </div>
                     <p class="!my-0 text-gray-400 h-6 overflow-hidden">
-                        {{ (winboat.metrics.value.disk.total / 1024).toFixed(2) }} GB Total Disk Space
+                        磁盘总量 {{ (winboat.metrics.value.disk.total / 1024).toFixed(2) }} GB
                     </p>
                     <p class="!my-0 text-gray-400 h-6 overflow-hidden">
-                        {{ (winboat.metrics.value.disk.used / 1024).toFixed(2) }} GB Used Space
+                        已用空间 {{ (winboat.metrics.value.disk.used / 1024).toFixed(2) }} GB
                     </p>
                 </div>
             </x-card>
@@ -198,6 +198,14 @@ import { openAnchorLink } from "../utils/openLink";
 const winboat = Winboat.getInstance();
 const compose = ref<ComposeConfig | null>(null);
 const wallpaper = ref("");
+
+const STATUS_MAP: Record<string, string> = {
+    [ContainerStatus.RUNNING]: "运行中",
+    [ContainerStatus.EXITED]: "已停止",
+    [ContainerStatus.PAUSED]: "已暂停",
+    [ContainerStatus.UNKNOWN]: "未知",
+    [ContainerStatus.CREATED]: "已创建",
+};
 
 onMounted(async () => {
     compose.value = Winboat.readCompose(winboat.containerMgr!.composeFilePath);

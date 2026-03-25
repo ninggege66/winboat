@@ -30,24 +30,23 @@
         <dialog ref="updateDialog">
             <Icon class="text-indigo-400 size-12" icon="mdi:cloud-upload"></Icon>
             <template v-if="manualUpdateRequired">
-                <h3 class="mt-2">Manual Guest Server Update Required</h3>
+                <h3 class="mt-2">需要手动更新访客端服务</h3>
                 <div class="max-w-[60vw]">
                     <strong
-                        >WinBoat has encountered an issue while trying to update the Guest Server automatically. Please
-                        follow the steps below to manually update it:</strong
+                        >WinBoat 在尝试自动更新访客端服务时遇到问题。请按照以下步骤手动更新：</strong
                     >
                     <ol class="mt-2 list-decimal list-inside">
                         <li>
-                            Use VNC over at
+                            通过 VNC 访问 Windows：
                             <a @click="openAnchorLink" :href="novncURL" target="_blank" rel="noopener noreferrer">
                                 {{ novncURL }}
                             </a>
-                            to access Windows
+                            以访问 Windows
                         </li>
-                        <li>Press Win + R or search for <code>Run</code>, type in <code>services.msc</code></li>
-                        <li>Stop the <code>WinBoatGuestServer</code> service by right clicking and pressing "Stop"</li>
+                        <li>按 Win + R 或搜索 <code>运行</code>，输入 <code>services.msc</code></li>
+                        <li>右键点击 <code>WinBoatGuestServer</code> 服务并选择“停止”</li>
                         <li>
-                            Download the new Guest Server from
+                            从以下地址下载新的访客端服务：
                             <a
                                 @click="openAnchorLink"
                                 href="https://github.com/TibixDev/winboat/releases"
@@ -56,36 +55,34 @@
                             >
                                 https://github.com/TibixDev/winboat/releases
                             </a>
-                            , you should pick version <strong>{{ appVer }}</strong>
+                            ，您应该选择版本 <strong>{{ appVer }}</strong>
                         </li>
-                        <li>Navigate to <code>C:\Program Files\WinBoat</code> and delete the contents</li>
-                        <li>Extract the freshly downloaded zip into the same folder</li>
+                        <li>导航至 <code>C:\Program Files\WinBoat</code> 并删除其中的内容</li>
+                        <li>将新下载的压缩包解压到同一文件夹中</li>
                         <li>
-                            Start the <code>WinBoatGuestServer</code> service by right clicking and pressing "Start"
+                            右键点击 <code>WinBoatGuestServer</code> 服务并选择“启动”
                         </li>
-                        <li>If you were using VNC, log out of Windows and close it</li>
-                        <li>Restart WinBoat</li>
+                        <li>如果您正在使用 VNC，请注销 Windows 并关闭它</li>
+                        <li>重启 WinBoat</li>
                     </ol>
-                    <p>We're sorry for the inconvenience. 😟</p>
+                    <p>很抱歉给您带来不便。 😟</p>
                 </div>
             </template>
 
             <template v-else>
-                <h3 class="mt-2" v-if="winboat?.isUpdatingGuestServer.value">Updating Guest Server</h3>
-                <h3 class="mt-2" v-else>Guest Server update successful!</h3>
+                <h3 class="mt-2" v-if="winboat?.isUpdatingGuestServer.value">正在更新访客端服务</h3>
+                <h3 class="mt-2" v-else>访客端服务更新成功！</h3>
                 <p v-if="winboat?.isUpdatingGuestServer.value" class="max-w-[40vw]">
-                    The guest is currently running an outdated version of the WinBoat Guest Server. Please wait while we
-                    update it to the current version.
+                    访客端当前运行的是旧版本的 WinBoat 访客端服务。正在更新至当前版本，请稍候。
                 </p>
                 <p v-else class="max-w-[40vw]">
-                    The WinBoat Guest Server has been updated successfully! You can now close this dialog and continue
-                    using the application.
+                    WinBoat 访客端服务已成功更新！现在您可以关闭此对话框并继续使用。
                 </p>
             </template>
             <footer v-if="!manualUpdateRequired">
                 <x-progressbar v-if="winboat?.isUpdatingGuestServer.value" class="my-4"></x-progressbar>
                 <x-button v-else id="close-button" @click="updateDialog!.close()" toggled>
-                    <x-label>Close</x-label>
+                    <x-label>关闭</x-label>
                 </x-button>
             </footer>
         </dialog>
@@ -101,7 +98,7 @@
                     class="w-full bg-gradient-to-r from-indigo-500 via-indigo-400 to-blue-500 text-white !mt-0 py-1 shadow-md shadow-indigo-500/50 transition-all duration-300 hover:brightness-105 flex flex-row items-center justify-center gap-2"
                 >
                     <Icon class="size-5" icon="mdi:remote-desktop"></Icon>
-                    <span class="font-semibold text-center"> RDP Session Active </span>
+                    <span class="font-semibold text-center"> RDP 会话活动中 </span>
                 </div>
                 <div class="flex flex-row gap-4 items-center p-4">
                     <img
@@ -111,7 +108,7 @@
                     />
                     <div>
                         <x-label class="text-lg font-semibold">{{ os.userInfo().username }}</x-label>
-                        <x-label class="text-[0.8rem]">Local Account</x-label>
+                        <x-label class="text-[0.8rem]">本地账户</x-label>
                     </div>
                 </div>
                 <RouterLink
@@ -123,7 +120,7 @@
                 >
                     <x-navitem>
                         <Icon class="mr-4 w-5 h-5" :icon="(route.meta!.icon as string)" />
-                        <x-label>{{ route.name }}</x-label>
+                        <x-label>{{ route.meta!.label }}</x-label>
                     </x-navitem>
                 </RouterLink>
                 <div class="flex flex-col justify-end items-center p-4 h-full">
@@ -137,7 +134,7 @@
                     <Icon class="w-6 h-6" icon="bitcoin-icons:caret-right-filled"></Icon>
                     <Icon class="w-6 h-6" :icon="useRoute().meta.icon as string"></Icon>
                     <h1 class="my-0 text-2xl font-semibold">
-                        {{ useRoute().name }}
+                        {{ useRoute().meta.label }}
                     </h1>
                 </div>
                 <router-view v-slot="{ Component }">
@@ -185,22 +182,33 @@ const novncURL = ref("");
 const animationsDisabled = computed(() => wbConfig?.config.disableAnimations);
 
 onMounted(async () => {
-    const winboatInstalled = await isInstalled();
+    try {
+        const winboatInstalled = await isInstalled();
 
-    if (winboatInstalled) {
-        wbConfig = reactive(WinboatConfig.getInstance()); // Instantiate singleton class
-        winboat = Winboat.getInstance(); // Instantiate singleton class
-        USBManager.getInstance(); // Instantiate singleton class
+        if (winboatInstalled) {
+            wbConfig = reactive(WinboatConfig.getInstance()); // Instantiate singleton class
+            winboat = Winboat.getInstance(); // Instantiate singleton class
+            USBManager.getInstance(); // Instantiate singleton class
 
-        // Migrations
-        $router.push("/migration");
-        await performAutoMigrations();
+            // Migrations
+            $router.push("/migration");
+            await performAutoMigrations();
 
-        // After migrations, go to home
-        $router.push("/home");
-    } else {
-        console.log("Not installed, redirecting to setup...");
-        $router.push("/setup");
+            // After migrations, go to home
+            $router.push("/home");
+        } else {
+            console.log("Not installed, redirecting to setup...");
+            $router.push("/setup");
+        }
+    } catch (e: any) {
+        console.error("Initialization failed:", e);
+        // Show error to user if possible
+        try {
+            const { dialog } = require("@electron/remote");
+            dialog.showErrorBox("WinBoat 初始化失败", e.message || String(e));
+        } catch (err) {
+            console.error("Could not show error box:", err);
+        }
     }
 
     // Watch for guest server updates and show dialog

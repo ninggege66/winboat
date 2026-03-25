@@ -19,12 +19,11 @@
             />
         </div>
         <h3 class="mt-2">
-            Performing Migrations
+            正在执行迁移
             <div class="loader inline-block translate-y-1"></div>
         </h3>
         <p class="text-gray-400 max-w-[40vw] text-center">
-            Please wait while we migrate your existing WinBoat configuration to ensure compatibility with the latest
-            version.
+            请稍候，我们正在迁移您的现有 WinBoat 配置，以确保与最新版本兼容。
         </p>
     </div>
 </template>

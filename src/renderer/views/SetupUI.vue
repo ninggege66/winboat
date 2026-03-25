@@ -42,14 +42,13 @@
                     <div v-if="currentStep.id === StepID.WELCOME" class="step-block">
                         <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
-                            WinBoat is a full-fledged app that helps you natively run Windows applications on your Linux
-                            machine with ease.
+                            WinBoat 是一款功能齐全的应用，可帮助您在 Linux 机器上轻松运行 Windows 应用程序。
                         </p>
                         <p class="text-lg text-gray-400">
-                            We will go through a few required steps to get you started in no time.
+                            我们将引导您完成几个必要步骤，让您立即开始使用。
                         </p>
                         <div class="flex flex-row gap-4">
-                            <x-button toggled class="px-6" @click="currentStepIdx++">Next</x-button>
+                            <x-button toggled class="px-6" @click="currentStepIdx++">下一步</x-button>
                         </div>
                     </div>
 
@@ -57,15 +56,14 @@
                     <div v-if="currentStep.id === StepID.LICENSE" class="step-block">
                         <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
-                            WinBoat is open-source software licensed under the MIT License. Please review the license
-                            agreement below.
+                            WinBoat 是基于 MIT 许可协议的开源软件。请阅读下面的许可协议。
                         </p>
                         <pre class="text-sm text-gray-400 bg-neutral-800 p-4 rounded-lg overflow-auto">
                             {{ license }}
                         </pre>
                         <div class="flex flex-row gap-4">
-                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
-                            <x-button toggled class="px-6" @click="currentStepIdx++">I Agree</x-button>
+                            <x-button class="px-6" @click="currentStepIdx--">上一步</x-button>
+                            <x-button toggled class="px-6" @click="currentStepIdx++">我同意</x-button>
                         </div>
                     </div>
 
@@ -73,32 +71,32 @@
                     <div v-if="currentStep.id === StepID.PREREQUISITES" class="step-block">
                         <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
-                            In order to run WinBoat, your computer must meet the following requirements.
+                            为了运行 WinBoat，您的计算机必须满足以下要求。
                         </p>
                         <ul class="text-lg text-gray-400 list-none space-y-1.5 bg-neutral-800 py-3 rounded-lg">
                             <li class="flex items-center gap-2">
                                 <span v-if="specs.ramGB >= 4" class="text-green-500">✔</span>
                                 <span v-else class="text-red-500">✘</span>
-                                At least 4 GB of RAM (Detected: {{ specs.ramGB }} GB)
+                                至少 4 GB 内存 (检测到: {{ specs.ramGB }} GB)
                             </li>
 
                             <li class="flex items-center gap-2">
                                 <span v-if="specs.cpuCores >= 2" class="text-green-500">✔</span>
                                 <span v-else class="text-red-500">✘</span>
-                                At least 2 CPU cores (Detected: {{ specs.cpuCores }} cores)
+                                至少 2 CPU 核心 (检测到: {{ specs.cpuCores }} 核心)
                             </li>
 
                             <li class="flex items-center gap-2">
                                 <span v-if="specs.kvmEnabled" class="text-green-500">✔</span>
                                 <span v-else class="text-red-500">✘</span>
-                                Virtualization (KVM) enabled
+                                虚拟化 (KVM) 已启用
                                 <a
                                     href="https://duckduckgo.com/?t=h_&q=how+to+enable+virtualization+in+%3Cmotherboard+brand%3E+bios&ia=web"
                                     @click="openAnchorLink"
                                     target="_blank"
                                     class="text-violet-400 hover:underline ml-1"
                                 >
-                                    How?
+                                    如何开启？
                                 </a>
                             </li>
 
@@ -123,7 +121,7 @@
                                         </x-menu>
                                     </x-select>
                                 </div>
-                                installed
+                                已安装
                                 <a
                                     :href="containerRuntime === ContainerRuntimes.PODMAN
                                         ? 'https://podman.io/getting-started/installation'
@@ -131,7 +129,7 @@
                                     @click="openAnchorLink"
                                     target="_blank"
                                     class="text-violet-400 hover:underline ml-1"
-                                >How?</a>
+                                >如何开启？</a>
                             </li>
 
                             <!-- Docker Specific Requirements -->
@@ -147,13 +145,13 @@
                                         >✔</span
                                     >
                                     <span v-else class="text-red-500">✘</span>
-                                    Docker Compose v2 installed
+                                    Docker Compose v2 已安装
                                     <a
                                         href="https://docs.docker.com/compose/install/#plugin-linux-only"
                                         @click="openAnchorLink"
                                         target="_blank"
                                         class="text-violet-400 hover:underline ml-1"
-                                        >How?</a
+                                        >如何开启？</a
                                     >
                                 </li>
 
@@ -168,15 +166,15 @@
                                         >✔</span
                                     >
                                     <span v-else class="text-red-500">✘</span>
-                                    User added to the
-                                    <span class="font-mono bg-neutral-700 rounded-md px-0.5">docker</span> group
-                                    <span class="text-gray-600"> (Relog required) </span>
+                                    当前用户已添加至
+                                    <span class="font-mono bg-neutral-700 rounded-md px-0.5">docker</span> 组
+                                    <span class="text-gray-600"> (需要重新登录) </span>
                                     <a
                                         href="https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user"
                                         @click="openAnchorLink"
                                         target="_blank"
                                         class="text-violet-400 hover:underline ml-1"
-                                        >How?</a
+                                        >详情?</a
                                     >
                                 </li>
 
@@ -191,14 +189,14 @@
                                         >✔</span
                                     >
                                     <span v-else class="text-red-500">✘</span>
-                                    Docker daemon is running
-                                    <span class="text-gray-600"> (Also enable on boot) </span>
+                                    Docker 守护进程正在运行
+                                    <span class="text-gray-600"> (同时也请开启开机自启) </span>
                                     <a
                                         href="https://docs.docker.com/config/daemon/start/"
                                         @click="openAnchorLink"
                                         target="_blank"
                                         class="text-violet-400 hover:underline ml-1"
-                                        >How?</a
+                                        >详情?</a
                                     >
                                 </li>
                             </template>
@@ -216,39 +214,39 @@
                                         >✔</span
                                     >
                                     <span v-else class="text-red-500">✘</span>
-                                    Podman Compose installed
+                                    Podman Compose 已安装
                                     <a
                                         href="https://github.com/containers/podman-compose?tab=readme-ov-file#installation"
                                         @click="openAnchorLink"
                                         target="_blank"
                                         class="text-violet-400 hover:underline ml-1"
-                                        >How?</a
+                                        >详情?</a
                                     >
                                 </li>
                             </template>
                             <li class="flex items-center gap-2">
                                 <span v-if="specs.freeRDP3Installed" class="text-green-500">✔</span>
                                 <span v-else class="text-red-500">✘</span>
-                                FreeRDP 3.x.x installed
+                                FreeRDP 3.x.x 已安装
                                 <a
                                     href="https://github.com/FreeRDP/FreeRDP/wiki/PreBuilds"
                                     @click="openAnchorLink"
                                     target="_blank"
                                     class="text-violet-400 hover:underline ml-1"
                                 >
-                                    How?
+                                    如何开启？
                                 </a>
                             </li>
                         </ul>
                         <div class="flex flex-row gap-4 mt-6">
-                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
+                            <x-button class="px-6" @click="currentStepIdx--">上一步</x-button>
                             <x-button
                                 toggled
                                 class="px-6"
                                 @click="currentStepIdx++"
                                 :disabled="!satisfiesPrequisites(specs, containerSpecs)"
                             >
-                                Next
+                                下一步
                             </x-button>
                         </div>
                     </div>
@@ -297,14 +295,14 @@
                         </div>
 
                         <div class="flex flex-row gap-4 mt-6">
-                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
+                            <x-button class="px-6" @click="currentStepIdx--">上一步</x-button>
                             <x-button
                                 toggled
                                 class="px-6"
                                 :disabled="!installFolder || installFolderErrors?.length"
                                 @click="currentStepIdx++"
                             >
-                                Next
+                                下一步
                             </x-button>
                         </div>
                     </div>
@@ -407,18 +405,16 @@
                     <!-- User Configuration -->
                     <div v-if="currentStep.id === StepID.USER_CONFIG" class="step-block">
                         <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
-                        <p class="text-lg text-gray-400">Configure the username and password for Windows.</p>
+                        <p class="text-lg text-gray-400">配置 Windows 的用户名和密码。</p>
 
                         <p class="text-lg text-gray-400">
-                            These credentials will be used to log in to the Windows virtual machine and to access it
-                            through Remote Desktop Protocol (RDP). You will not be able to change these settings later
-                            on unless you reinstall.
+                            这些凭据将用于登录 Windows 虚拟机并通过远程桌面协议 (RDP) 访问它。除非重新安装，否则您以后无法更改这些设置。
                         </p>
 
                         <div class="flex flex-row gap-4">
                             <div class="flex flex-col gap-4">
                                 <div>
-                                    <label for="select-username" class="text-sm mb-4 text-neutral-400">Username</label>
+                                    <label for="select-username" class="text-sm mb-4 text-neutral-400">用户名</label>
                                     <x-input
                                         id="select-username"
                                         class="w-64 max-w-64"
@@ -431,12 +427,12 @@
                                         @input="(e: any) => (username = e.target.value)"
                                     >
                                         <x-icon href="#person"></x-icon>
-                                        <x-label>Name</x-label>
+                                        <x-label>名称</x-label>
                                     </x-input>
                                 </div>
 
                                 <div>
-                                    <label for="select-password" class="text-sm mb-4 text-neutral-400">Password</label>
+                                    <label for="select-password" class="text-sm mb-4 text-neutral-400">密码</label>
                                     <x-input
                                         id="select-password"
                                         class="w-64 max-w-64"
@@ -449,13 +445,13 @@
                                         @input="(e: any) => (password = e.target.value)"
                                     >
                                         <x-icon href="#lock"></x-icon>
-                                        <x-label>Password</x-label>
+                                        <x-label>密码</x-label>
                                     </x-input>
                                 </div>
 
                                 <div>
                                     <label for="confirm-password" class="text-sm mb-4 text-neutral-400">
-                                        Confirm Password
+                                        确认密码
                                     </label>
                                     <x-input
                                         id="confirm-password"
@@ -469,7 +465,7 @@
                                         @input="(e: any) => (confirmPassword = e.target.value)"
                                     >
                                         <x-icon href="#lock" />
-                                        <x-label>Confirm Password</x-label>
+                                        <x-label>确认密码</x-label>
                                     </x-input>
                                 </div>
                             </div>
@@ -491,14 +487,14 @@
                         </div>
 
                         <div class="flex flex-row gap-4 mt-6">
-                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
+                            <x-button class="px-6" @click="currentStepIdx--">上一步</x-button>
                             <x-button
                                 :disabled="usernameErrors.length || passwordErrors.length"
                                 toggled
                                 class="px-6"
                                 @click="currentStepIdx++"
                             >
-                                Next
+                                下一步
                             </x-button>
                         </div>
                     </div>
@@ -507,18 +503,16 @@
                     <div v-if="currentStep.id === StepID.HARDWARE_CONFIG" class="step-block">
                         <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
-                            WinBoat utilizes a containerized KVM virtual machine to run Windows applications. Please
-                            configure the hardware settings for the virtual machine.
+                            WinBoat 利用容器化的 KVM 虚拟机来运行 Windows 应用程序。请配置虚拟机的硬件设置。
                         </p>
 
                         <p class="text-lg text-gray-400">
-                            It is not recommended to allocate more than half of your system resources to Windows. You
-                            will be able to change these settings later on if needed.
+                            建议不要分配超过一半的系统资源给 Windows。如果需要，您以后可以更改这些设置。
                         </p>
 
                         <div class="flex flex-col gap-6">
                             <div>
-                                <label for="select-cpu-cores" class="text-sm text-neutral-400">Select CPU Cores</label>
+                                <label for="select-cpu-cores" class="text-sm text-neutral-400">选择 CPU 核心</label>
                                 <div class="flex flex-row gap-4 items-center">
                                     <x-slider
                                         id="select-cpu-cores"
@@ -530,19 +524,19 @@
                                         step="1"
                                         ticks
                                     />
-                                    <x-label>{{ cpuCores }} Core{{ cpuCores > 1 ? "s" : "" }}</x-label>
+                                    <x-label>{{ cpuCores }} 核心</x-label>
                                 </div>
                             </div>
 
                             <div>
                                 <label for="select-ram" class="text-sm text-neutral-400">
-                                    Select RAM
+                                    选择内存
                                     <span
                                         v-if="memoryInfo.availableGB < ramGB"
                                         class="relative group text-white font-bold text-xs rounded-full bg-red-600 px-2 pb-0.5 ml-2 hover:bg-red-700 transition"
                                     >
                                         <Icon icon="line-md:alert" class="inline size-4 -translate-y-0.5" />
-                                        Warning
+                                        警告
                                         <span
                                             class="absolute bottom-5 right-[-160px] z-50 w-[320px] bg-neutral-900 text-xs text-gray-300 rounded-lg shadow-lg px-3 py-2 hidden group-hover:block transition-opacity duration-200 pointer-events-none"
                                         >
@@ -569,13 +563,13 @@
 
                             <div>
                                 <label for="select-disk" class="text-sm text-neutral-400">
-                                    Select Disk Size
+                                    选择磁盘大小
                                     <span
                                         v-if="(installFolderDiskSpaceGB || 0) - diskSpaceGB < 5"
                                         class="relative group text-white font-bold text-xs rounded-full bg-red-600 px-2 pb-0.5 ml-2 hover:bg-red-700 transition"
                                     >
                                         <Icon icon="line-md:alert" class="inline size-4 -translate-y-0.5"></Icon>
-                                        Warning
+                                        警告
                                         <span
                                             class="absolute bottom-5 right-[-160px] z-50 w-[320px] bg-neutral-900 text-xs text-gray-300 rounded-lg shadow-lg px-3 py-2 hidden group-hover:block transition-opacity duration-200 pointer-events-none"
                                         >
@@ -603,23 +597,21 @@
                         </div>
 
                         <div class="flex flex-row gap-4 mt-6">
-                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
-                            <x-button toggled class="px-6" @click="currentStepIdx++">Next</x-button>
+                            <x-button class="px-6" @click="currentStepIdx--">上一步</x-button>
+                            <x-button toggled class="px-6" @click="currentStepIdx++">下一步</x-button>
                         </div>
                     </div>
 
                     <!-- Folder Sharing -->
                     <div v-if="currentStep.id === StepID.SHOULD_SHARE_HOME_FOLDER" class="step-block">
-                        <h1 class="text-3xl font-semibold">Folder Sharing</h1>
+                        <h1 class="text-3xl font-semibold">文件夹共享</h1>
                         <p class="text-lg text-gray-400">
-                            WinBoat allows you to share a folder from your Linux system with the Windows virtual machine.
-                            You can choose whether to enable this feature and select which folder to share.
+                            WinBoat 允许您将 Linux 系统中的文件夹与 Windows 虚拟机共享。您可以选择是否启用此功能并选择要共享的文件夹。
                         </p>
                         <p class="text-lg text-gray-400">
-                            <b>⚠️ WARNING:</b>
-                            Sharing a folder exposes your Linux files to Windows-specific malware and viruses.
-                            Only enable this feature if you understand the risks involved. Always be careful with the
-                            files you download and open in Windows.
+                            <b>⚠️ 警告：</b>
+                            共享文件夹会使您的 Linux 文件面临 Windows 特有的恶意软件和病毒的风险。
+                            只有在您了解所涉及的风险时才启用此功能。始终小心您在 Windows 中下载和打开的文件。
                         </p>
 
                         <x-checkbox
@@ -627,9 +619,9 @@
                             @toggle="folderSharing = !folderSharing"
                             :toggled="folderSharing"
                         >
-                            <x-label><strong>Enable folder sharing</strong></x-label>
+                            <x-label><strong>启用文件夹共享</strong></x-label>
                             <x-label class="text-gray-400">
-                                By checking this box, you acknowledge the risks mentioned above
+                                通过勾选此框，您表示知晓上述风险
                             </x-label>
                         </x-checkbox>
 
@@ -653,14 +645,14 @@
                         </div>
 
                         <div class="flex flex-row gap-4 mt-6">
-                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
+                            <x-button class="px-6" @click="currentStepIdx--">上一步</x-button>
                             <x-button
                                 toggled
                                 class="px-6"
                                 @click="currentStepIdx++"
                                 :disabled="folderSharing && !sharedFolderPath"
                             >
-                                Next
+                                下一步
                             </x-button>
                         </div>
                     </div>
@@ -669,51 +661,50 @@
                     <div v-if="currentStep.id === StepID.REVIEW" class="step-block">
                         <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
-                            Please review the settings you've chosen for your WinBoat installation. If everything looks
-                            correct, click "Install" to begin.
+                            请检查您为 WinBoat 安装选择的设置。如果一切看起来都正确，请点击“安装”开始。
                         </p>
 
                         <div class="bg-neutral-800 p-6 rounded-lg flex flex-col gap-4">
-                            <h2 class="text-xl font-medium text-white mt-0 mb-2">Your Configuration</h2>
+                            <h2 class="text-xl font-medium text-white mt-0 mb-2">您的配置</h2>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">Container Runtime</span>
+                                    <span class="text-sm text-gray-400">容器运行时</span>
                                     <span class="text-base text-white">{{ containerRuntime }}</span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">Language</span>
+                                    <span class="text-sm text-gray-400">语言</span>
                                     <span class="text-base text-white">{{ windowsLanguage }}</span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">Windows Version</span>
+                                    <span class="text-sm text-gray-400">Windows 版本</span>
                                     <span class="text-base text-white">{{ WINDOWS_VERSIONS[windowsVersion] }}</span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">CPU Cores</span>
-                                    <span class="text-base text-white">{{ cpuCores }} Cores</span>
+                                    <span class="text-sm text-gray-400">CPU 核心</span>
+                                    <span class="text-base text-white">{{ cpuCores }} 核心</span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">RAM</span>
+                                    <span class="text-sm text-gray-400">内存</span>
                                     <span class="text-base text-white">{{ ramGB }} GB</span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">Disk Size</span>
+                                    <span class="text-sm text-gray-400">磁盘大小</span>
                                     <span class="text-base text-white">{{ diskSpaceGB }} GB</span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">Username</span>
+                                    <span class="text-sm text-gray-400">用户名</span>
                                     <span class="text-base text-white">{{ username }}</span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-400">Install Location</span>
+                                    <span class="text-sm text-gray-400">安装位置</span>
                                     <span class="text-base text-white">{{ installFolder }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex flex-row gap-4 mt-6">
-                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
+                            <x-button class="px-6" @click="currentStepIdx--">上一步</x-button>
                             <x-button
                                 toggled
                                 class="px-6"
@@ -722,27 +713,26 @@
                                     install();
                                 "
                             >
-                                Install
+                                安装
                             </x-button>
                         </div>
                     </div>
 
                     <!-- Installation -->
                     <div v-if="currentStep.id === StepID.INSTALL" class="step-block">
-                        <h1 class="text-3xl font-semibold">Installation</h1>
+                        <h1 class="text-3xl font-semibold">安装</h1>
                         <p class="text-lg text-gray-400 text-justify">
-                            WinBoat is now installing Windows. Please be patient as this may take up to an hour. In the
-                            meantime, you can grab a coffee and check the installation status
+                            WinBoat 正在安装 Windows。请耐心等待，这可能需要长达一小时的时间。在此期间，您可以喝杯咖啡并在浏览器中查看状态
                             <span v-if="linkableInstallSteps.includes(installState)">
-                                <a :href="`http://127.0.0.1:${vncPort}`" @click="openAnchorLink">in your browser</a>.
+                                <a :href="`http://127.0.0.1:${vncPort}`" @click="openAnchorLink">在浏览器中查看</a>。
                             </span>
                             <span v-else>
-                                over at
+                                进度详见
                                 <div
                                     style="animation-duration: 3s!important;"
                                     class="ml-1 inline-block relative text-transparent rounded-md bg-neutral-700 animate-pulse select-none"
                                 >
-                                    in your browser
+                                    在浏览器中查看
                                     <Icon icon="eos-icons:three-dots-loading" class="pointer-events-none absolute top-0 left-[50%] size-16 text-violet-400 -translate-x-[50%] -translate-y-[27.5%]"></Icon>
                                 </div>
                             </span>
@@ -774,18 +764,18 @@
                         >
                             <Icon icon="line-md:alert" class="size-16 text-red-500"></Icon>
                             <x-label class="text-lg text-gray-400 text-center">
-                                An error occurred while installing Windows. Please check the logs in
+                                安装 Windows 时发生错误。请检查
                                 <span class="font-mono bg-neutral-700 rounded-md px-0.5">~/.winboat</span>
-                                and verify
+                                中的日志，并在终端中验证
                                 <span class="font-mono bg-neutral-700 rounded-md px-0.5"
                                     >{{ installManager!.container.executableAlias }} logs WinBoat</span
                                 >
-                                in your terminal for more information.
+                                以获取更多信息。
                             </x-label>
                             <x-label class="text-lg text-gray-400 text-center">
-                                To reset and try again, follow
-                                <a href="https://rentry.org/winboat_retry_install" @click="openAnchorLink">these</a>
-                                instructions.
+                                要重置并重试，请遵循
+                                <a href="https://rentry.org/winboat_retry_install" @click="openAnchorLink">这些</a>
+                                说明。
                             </x-label>
                         </div>
 
@@ -796,9 +786,9 @@
                         >
                             <Icon icon="line-md:confirm-circle" class="size-16 text-green-500"></Icon>
                             <x-label class="text-lg text-gray-400 text-center">
-                                Windows has been installed successfully!
+                                Windows 已成功安装！
                             </x-label>
-                            <x-button @click="$router.push('/home')">Finish</x-button>
+                            <x-button @click="$router.push('/home')">完成</x-button>
                         </div>
                     </div>
                 </div>
@@ -856,57 +846,57 @@ enum StepID {
 const steps: Step[] = [
     {
         id: StepID.WELCOME,
-        title: "Welcome to WinBoat",
+        title: "欢迎使用 WinBoat",
         icon: "tdesign:wave-bye-filled",
     },
     {
         id: StepID.LICENSE,
-        title: "License Agreement",
+        title: "许可协议",
         icon: "line-md:text-box-multiple",
     },
     {
         id: StepID.PREREQUISITES,
-        title: "Pre-Requisites",
+        title: "前置条件",
         icon: "line-md:check-all",
     },
     {
         id: StepID.INSTALL_LOCATION,
-        title: "Install Location",
+        title: "安装位置",
         icon: "line-md:folder-arrow-down-filled",
     },
     {
         id: StepID.WINDOWS_CONFIG,
-        title: "Configure Windows",
+        title: "配置 Windows",
         icon: "mage:microsoft-windows",
     },
     {
         id: StepID.USER_CONFIG,
-        title: "User Configuration",
+        title: "用户配置",
         icon: "line-md:account",
     },
     {
         id: StepID.HARDWARE_CONFIG,
-        title: "Hardware Configuration",
+        title: "硬件配置",
         icon: "famicons:hardware-chip-outline",
     },
     {
         id: StepID.SHOULD_SHARE_HOME_FOLDER,
-        title: "Folder Sharing",
+        title: "文件夹共享",
         icon: "line-md:link",
     },
     {
         id: StepID.REVIEW,
-        title: "Review",
+        title: "检查",
         icon: "solar:pin-list-bold",
     },
     {
         id: StepID.INSTALL,
-        title: "Installation",
+        title: "安装",
         icon: "line-md:downloading-loop",
     },
     {
         id: StepID.FINISH,
-        title: "Finish",
+        title: "完成",
         icon: "bx:bxs-check-circle",
     },
 ];
@@ -988,12 +978,12 @@ const usernameErrors = computed(() => {
 
     // At least 2 characters
     if (username.value.length < 2) {
-        errors.push("Must be at least 2 characters long");
+        errors.push("长度必须至少为 2 个字符");
     }
 
     // Only alphanumeric characters are allowed
     if (!/^[a-zA-Z0-9]+$/.test(username.value)) {
-        errors.push("Must only contain alphanumeric characters");
+        errors.push("只能包含字母数字字符");
     }
 
     return errors;
@@ -1004,17 +994,17 @@ const passwordErrors = computed(() => {
 
     // Must match confirm password
     if (password.value !== confirmPassword.value) {
-        errors.push("Passwords do not match");
+        errors.push("密码不匹配");
     }
 
     // Only alphanumeric characters are allowed
     if (!/^[a-zA-Z0-9]+$/.test(password.value)) {
-        errors.push("Must only contain alphanumeric characters");
+        errors.push("只能包含字母数字字符");
     }
 
     // At least 4 characters
     if (password.value.length < 4) {
-        errors.push("Must be at least 4 characters long");
+        errors.push("长度必须至少为 4 个字符");
     }
 
     return errors;

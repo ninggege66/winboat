@@ -650,18 +650,32 @@ export class Winboat {
             .concat(newArgs);
         let args = [`/u:${username}`, `/p:${password}`, `/v:127.0.0.1`, `/port:${rdpHostPort}`, ...combinedArgs];
 
+        const scale = this.#wbConfig?.config.scale ?? 100;
+        const scaleDesktop = this.#wbConfig?.config.scaleDesktop ?? 100;
+
+        // xfreerdp3 only supports 100, 140, 180 for /scale
+        const getValidScale = (val: number) => {
+            if (val >= 180) return 180;
+            if (val >= 140) return 140;
+            return 100;
+        };
+        const freerdpScale = getValidScale(scale);
+        const freerdpScaleDesktop = getValidScale(scaleDesktop);
+
         if (app.Path == InternalApps.WINDOWS_DESKTOP) {
             args = args.concat([
                 "+f",
                 this.#wbConfig?.config.smartcardEnabled ? "/smartcard" : "",
-                `/scale:${this.#wbConfig?.config.scale ?? 100}`,
+                `/scale:${freerdpScale}`,
+                `/scale-desktop:${scale}`,
             ]);
         } else {
             args = args.concat([
                 this.#wbConfig?.config.multiMonitor === MultiMonitorMode.Span ? "+span" : "",
                 "-wallpaper",
                 this.#wbConfig?.config.multiMonitor === MultiMonitorMode.MultiMon ? "/multimon" : "",
-                `/scale-desktop:${this.#wbConfig?.config.scaleDesktop ?? 100}`,
+                `/scale:${freerdpScale}`,
+                `/scale-desktop:${scaleDesktop}`,
                 `/wm-class:winboat-${cleanAppName}`,
                 `/app:program:${app.Path},name:${cleanAppName},cmd:"${app.Args}"`,
             ]);
