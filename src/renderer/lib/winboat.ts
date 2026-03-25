@@ -78,6 +78,8 @@ const stockArgs = [
     "/floatbar",
     "/compression",
     "/sec:tls",
+    "+dynamic-resolution",
+    "+window-drag",
 ];
 
 /**
