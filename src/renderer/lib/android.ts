@@ -72,6 +72,18 @@ export class AndroidManager {
     }
 
     /**
+     * Check for required kernel modules (binder, ashmem)
+     */
+    async checkKernelModules(): Promise<void> {
+        try {
+            await execFileAsync("ls", ["/dev/binder"]);
+        } catch (e) {
+            logger.error("Critical: /dev/binder is missing! Redroid will not work.");
+            throw new Error("检测到系统缺少 binder 驱动，请确保已安装 anhbox-modules 或类似的内核模块。");
+        }
+    }
+
+    /**
      * Start a Redroid container
      */
     async startInstance(id: string): Promise<void> {
@@ -79,21 +91,37 @@ export class AndroidManager {
         const instance = config.config.androidInstances.find(i => i.id === id);
         if (!instance) throw new Error("Instance not found");
 
+        instance.status = "starting";
+
+        // Check kernel modules
+        try {
+            await this.checkKernelModules();
+        } catch (e) {
+            instance.status = "stopped";
+            throw e;
+        }
+
         // Check if image exists, if not pull it
         try {
             await execFileAsync("docker", ["inspect", "redroid/redroid:11.0.0-latest"]);
         } catch (e) {
+            logger.info("Redroid image not found locally, pulling...");
             await this.pullImage();
         }
 
-        instance.status = "starting";
+        // Clean up any existing container with same ID to avoid conflict
+        try {
+            await execFileAsync("docker", ["rm", "-f", instance.id]);
+        } catch (e) {
+            // Ignore if not exists
+        }
 
         const args = [
             "run", "-d",
             "--name", instance.id,
             "--memory-swappiness=0",
             "--privileged",
-            // We'll need unique ports for each instance
+            "-v", `/home/ning/.winboat/redroid/${instance.id}:/data`, // Persist data
             "-p", `${instance.adbPort}:5555`,
         ];
 
@@ -201,6 +229,65 @@ export class AndroidManager {
         } finally {
             await execFileAsync("adb", ["disconnect", adbAddr]);
         }
+    }
+
+    /**
+     * Check entire environment for Android support
+     */
+    async checkEnvironment(): Promise<{ docker: boolean, adb: boolean, binder: boolean, image: boolean }> {
+        const status = { docker: false, adb: false, binder: false, image: false };
+        
+        try { await execFileAsync("docker", ["--version"]); status.docker = true; } catch (e) {}
+        try { await execFileAsync("adb", ["--version"]); status.adb = true; } catch (e) {}
+        try { await execFileAsync("ls", ["/dev/binder"]); status.binder = true; } catch (e) {}
+        try { 
+            const { stdout } = await execFileAsync("docker", ["images", "--format", "{{.Repository}}:{{.Tag}}"]);
+            status.image = stdout.includes("redroid/redroid:11.0.0-latest");
+        } catch (e) {}
+
+        return status;
+    }
+
+    /**
+     * One-click fix for the environment
+     */
+    async fixEnvironment(): Promise<void> {
+        logger.info("Starting environment auto-fix...");
+        
+        // 1. Install Docker if missing
+        try {
+            await execFileAsync("docker", ["--version"]);
+        } catch (e) {
+            logger.info("Docker missing, installing...");
+            await execFileAsync("pkexec", ["apt", "update"]);
+            await execFileAsync("pkexec", ["apt", "install", "-y", "docker.io", "docker-compose"]);
+            await execFileAsync("pkexec", ["systemctl", "enable", "--now", "docker"]);
+            // Add user to docker group if possible, or just use sudo
+        }
+
+        // 2. Install ADB
+        await this.ensureAdb();
+
+        // 3. Fix Binder modules
+        try {
+            await execFileAsync("ls", ["/dev/binder"]);
+        } catch (e) {
+            logger.info("Binder missing, attempting to load...");
+            await execFileAsync("pkexec", ["apt", "install", "-y", "linux-modules-extra-$(uname -r)", "dkms"]);
+            try {
+                await execFileAsync("pkexec", ["modprobe", "binder_linux", "devices=binder,hwbinder,vndbinder,shm"]);
+                await execFileAsync("pkexec", ["modprobe", "ashmem_linux"]);
+            } catch (err) {
+                logger.error(`Failed to modprobe: ${err}`);
+                // Try anbox-modules-dkms as fallback
+                await execFileAsync("pkexec", ["apt", "install", "-y", "anbox-modules-dkms"]);
+                await execFileAsync("pkexec", ["modprobe", "binder_linux"]);
+                await execFileAsync("pkexec", ["modprobe", "ashmem_linux"]);
+            }
+        }
+
+        // 4. Pull Image
+        await this.pullImage();
     }
 
     /**

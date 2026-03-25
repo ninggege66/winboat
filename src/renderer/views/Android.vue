@@ -5,22 +5,37 @@
                 <Icon icon="mdi:android" class="text-green-500" />
                 安卓多开中心
             </h2>
-            <x-button @click="showCreateDialog = true" toggled>
+            <x-button @click="openCreateDialog" toggled>
                 <Icon icon="mdi:plus" class="mr-2" />
                 <x-label>新建实例</x-label>
             </x-button>
         </div>
 
-        <!-- Instance List -->
-        <div v-if="androidInstances.length === 0" class="flex flex-col items-center justify-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-            <Icon icon="mdi:android-debug-bridge" class="text-6xl opacity-20 mb-4" />
-            <p class="text-neutral-400">目前还没有安卓实例</p>
-            <x-button @click="showCreateDialog = true" class="mt-4">
-                <x-label>立即创建</x-label>
-            </x-button>
+        <!-- Environment Status Banner -->
+        <div v-if="!envStatus.docker || !envStatus.adb || !envStatus.binder" class="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex flex-row items-center justify-between gap-4 backdrop-blur-sm">
+            <div class="flex flex-row items-center gap-3">
+                <div class="p-2 bg-amber-500/20 rounded-lg text-amber-500">
+                    <Icon icon="mdi:alert-circle-outline" class="text-xl" />
+                </div>
+                <div>
+                    <h4 class="m-0 text-amber-500">检测到环境配置不完整</h4>
+                    <p class="text-xs text-neutral-400 mt-1">
+                        安卓运行需要 Docker, ADB 和 Binder 内核模块。
+                        <span v-if="!envStatus.docker" class="text-red-400 mr-2">[缺少 Docker]</span>
+                        <span v-if="!envStatus.adb" class="text-red-400 mr-2">[缺少 ADB]</span>
+                        <span v-if="!envStatus.binder" class="text-red-400 mr-2">[缺少 Binder 驱动]</span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-row gap-2">
+                <x-button @click="autoFixEnv" toggled skin="primary" class="!bg-amber-600 border-none">
+                    <Icon icon="mdi:wrench" class="mr-2" />
+                    <x-label>一键修复</x-label>
+                </x-button>
+            </div>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-row justify-between items-center">
             <div 
                 v-for="instance in androidInstances" 
                 :key="instance.id" 
@@ -43,8 +58,9 @@
                         <div>
                             <h3 class="m-0 text-lg">{{ instance.name }}</h3>
                             <div class="flex flex-row gap-2 items-center mt-1">
-                                <span class="size-2 rounded-full" :class="instance.status === 'running' ? 'bg-green-500' : 'bg-red-500'"></span>
-                                <span class="text-xs text-neutral-400 capitalize">{{ instance.status }}</span>
+                                <span v-if="instance.status !== 'starting'" class="size-2 rounded-full" :class="instance.status === 'running' ? 'bg-green-500' : 'bg-red-500'"></span>
+                                <Icon v-else icon="line-md:loading-loop" class="text-xs text-blue-400" />
+                                <span class="text-xs text-neutral-400 capitalize">{{ instance.status === 'starting' ? '正在启动/拉取镜像...' : instance.status }}</span>
                             </div>
                         </div>
                     </div>
@@ -55,10 +71,10 @@
                         <x-button v-if="instance.status === 'running'" @click="triggerApkSelect(instance.id)" skin="flat" title="安装 APK">
                             <Icon icon="mdi:file-import" />
                         </x-button>
-                        <x-button @click="toggleInstance(instance)" skin="flat">
-                            <Icon :icon="instance.status === 'running' ? 'mdi:stop' : 'mdi:play'" />
+                        <x-button @click="toggleInstance(instance)" skin="flat" :disabled="instance.status === 'starting'">
+                            <Icon :icon="instance.status === 'running' ? 'mdi:stop' : (instance.status === 'starting' ? 'line-md:loading-loop' : 'mdi:play')" />
                         </x-button>
-                        <x-button @click="deleteInstance(instance.id)" skin="flat" class="text-red-400">
+                        <x-button @click="deleteInstance(instance.id)" skin="flat" class="text-red-400" :disabled="instance.status === 'starting'">
                             <Icon icon="mdi:delete" />
                         </x-button>
                     </div>
@@ -89,12 +105,12 @@
         <input type="file" ref="apkInput" class="hidden" accept=".apk" @change="onApkFileSelected" />
 
         <!-- Create Dialog -->
-        <dialog v-if="showCreateDialog" class="p-0 bg-transparent" open>
+        <dialog ref="createDialog" class="p-0 bg-transparent">
             <div class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
                 <div class="bg-neutral-900 border border-white/10 rounded-3xl w-[500px] overflow-hidden shadow-2xl">
                     <div class="p-6 border-b border-white/10 flex flex-row justify-between items-center">
                         <h3 class="m-0">创建新安卓实例</h3>
-                        <x-button @click="showCreateDialog = false" skin="flat">
+                        <x-button @click="createDialog?.close()" skin="flat">
                             <Icon icon="mdi:close" />
                         </x-button>
                     </div>
@@ -165,15 +181,36 @@ import { WinboatConfig } from '../lib/config';
 import { AndroidManager } from '../lib/android';
 import { AndroidInstance } from '../../types';
 
-const wbConfig = WinboatConfig.getInstance();
+const wbConfig = reactive(WinboatConfig.getInstance());
 const androidMgr = AndroidManager.getInstance();
 
 const androidInstances = computed(() => wbConfig.config.androidInstances);
-const showCreateDialog = ref(false);
+const createDialog = ref<HTMLDialogElement | null>(null);
 const preset = ref('tablet-1080p');
 const draggingOver = ref<string | null>(null);
 const activeInstanceId = ref<string | null>(null);
 const apkInput = ref<HTMLInputElement | null>(null);
+const envStatus = reactive({ docker: true, adb: true, binder: true, image: true });
+
+async function refreshEnvStatus() {
+    const status = await androidMgr.checkEnvironment();
+    Object.assign(envStatus, status);
+}
+
+async function autoFixEnv() {
+    try {
+        await androidMgr.fixEnvironment();
+        await refreshEnvStatus();
+        alert('环境修复完成！请重试启动实例。');
+    } catch (e: any) {
+        alert(`修复失败: ${e.message}`);
+    }
+}
+
+function openCreateDialog() {
+    console.log("Opening create dialog...");
+    createDialog.value?.showModal();
+}
 
 const newConfig = reactive({
     name: '',
@@ -187,6 +224,7 @@ const newConfig = reactive({
 });
 
 onMounted(async () => {
+    await refreshEnvStatus();
     await androidMgr.syncStatus();
 });
 
@@ -200,7 +238,7 @@ function onDragLeave(id: string) {
 
 async function onDrop(event: DragEvent, id: string) {
     draggingOver.value = null;
-    const file = event.dataTransfer?.files[0];
+    const file = event.dataTransfer?.files?.[0];
     if (file && file.name.endsWith('.apk')) {
         await installApk(id, file.path);
     }
@@ -213,7 +251,7 @@ function triggerApkSelect(id: string) {
 
 async function onApkFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?[0];
+    const file = input.files?.[0];
     if (file && activeInstanceId.value) {
         // @ts-ignore - Electron file object has 'path'
         await installApk(activeInstanceId.value, file.path);
@@ -258,17 +296,21 @@ async function confirmCreate() {
         ...newConfig,
         status: 'stopped'
     });
-    showCreateDialog.value = false;
+    createDialog.value?.close();
     // Reset form
     newConfig.name = '';
     newConfig.isRoot = false;
 }
 
 async function toggleInstance(instance: AndroidInstance) {
-    if (instance.status === 'running') {
-        await androidMgr.stopInstance(instance.id);
-    } else {
-        await androidMgr.startInstance(instance.id);
+    try {
+        if (instance.status === 'running') {
+            await androidMgr.stopInstance(instance.id);
+        } else {
+            await androidMgr.startInstance(instance.id);
+        }
+    } catch (e: any) {
+        alert(`操作失败: ${e.message}`);
     }
 }
 
