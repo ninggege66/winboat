@@ -20,6 +20,7 @@ export type InstallConfiguration = {
     password: string;
     customIsoPath?: string;
     sharedFolderPath?: string;
+    gpuDevice?: string;
     container: ContainerRuntimes;
 };
 

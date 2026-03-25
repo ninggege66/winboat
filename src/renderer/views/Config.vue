@@ -95,6 +95,21 @@
                 <div class="flex flex-col">
                     <p class="my-0 text-red-500" v-for="(error, k) of errors" :key="k">❗ {{ error }}</p>
                 </div>
+                <!-- GPU Acceleration -->
+                <ConfigCard
+                    v-if="gpuList.length > 0"
+                    icon="mdi:gpu"
+                    title="显卡加速 (3D)"
+                    desc="选择用于提供 3D 硬件加速的显卡。如果选择专用显卡，渲染性能会更强。"
+                    type="dropdown"
+                    :options="['disabled', ...gpuList.map(g => g.path)]"
+                    v-model:value="wbConfig.config.gpuDevice"
+                >
+                    <template v-slot:custom-label="{ option }">
+                        {{ option === 'disabled' ? '禁用' : (gpuList.find(g => g.path === option)?.name || option) }}
+                    </template>
+                </ConfigCard>
+
                 <x-button
                     :disabled="saveButtonDisabled || isUpdatingUSBPrerequisites"
                     @click="saveCompose()"
@@ -470,6 +485,7 @@ import { Icon } from "@iconify/vue";
 import { MultiMonitorMode, RdpArg, WinboatConfig } from "../lib/config";
 import { USBManager, type PTSerializableDeviceInfo } from "../lib/usbmanager";
 import { type Device } from "usb";
+import { getGPUList, type GPUInfo } from "../lib/gpu";
 import {
     USB_VID_BLACKLIST,
     RESTART_ON_FAILURE,
@@ -505,6 +521,8 @@ const isUpdatingUSBPrerequisites = ref(false);
 
 // For USB Devices
 const availableDevices = ref<Device[]>([]);
+const gpuList = ref<GPUInfo[]>([]);
+const origGpuDevice = ref("disabled");
 
 // For handling the QMP port, as we can't rely on the winboat instance doing this for us.
 // A great example is when the container is offline. In that case, winboat's portManager isn't instantiated.
@@ -562,6 +580,16 @@ async function assignValues() {
     maxRamGB.value = specs.ramGB;
     maxNumCores.value = specs.cpuCores;
 
+    gpuList.value = await getGPUList();
+    const gpuEnv = compose.value.services.windows.environment.GPU;
+    if (gpuEnv === "on") {
+        const gpuDevice = compose.value.services.windows.devices?.find(d => d.includes("/dev/dri/renderD"));
+        wbConfig.config.gpuDevice = gpuDevice || "disabled";
+    } else {
+        wbConfig.config.gpuDevice = "disabled";
+    }
+    origGpuDevice.value = wbConfig.config.gpuDevice;
+
     refreshAvailableDevices();
 }
 
@@ -600,6 +628,33 @@ async function saveCompose() {
     });
 
     compose.value!.services.windows.ports = portMapper.value!.composeFormat;
+
+    // GPU mapping
+    const gpuDevice = wbConfig.config.gpuDevice;
+    if (gpuDevice && gpuDevice !== "disabled") {
+        if (!compose.value!.services.windows.devices) {
+            compose.value!.services.windows.devices = ["/dev/kvm"];
+        }
+        // Remove old renderD devices if any
+        compose.value!.services.windows.devices = compose.value!.services.windows.devices.filter(d => !d.includes("/dev/dri/renderD"));
+        compose.value!.services.windows.devices.push(gpuDevice);
+        compose.value!.services.windows.environment.GPU = "on";
+
+        // Check if discrete GPU and set DRI_PRIME
+        const selectedGpu = gpuList.value.find(g => g.path === gpuDevice);
+        if (selectedGpu?.isDiscrete) {
+            compose.value!.services.windows.environment.DRI_PRIME = "1";
+        } else {
+            delete compose.value!.services.windows.environment.DRI_PRIME;
+        }
+    } else {
+        compose.value!.services.windows.environment.GPU = "off";
+        delete compose.value!.services.windows.environment.DRI_PRIME;
+        // Remove renderD devices
+        if (compose.value!.services.windows.devices) {
+            compose.value!.services.windows.devices = compose.value!.services.windows.devices.filter(d => !d.includes("/dev/dri/renderD"));
+        }
+    }
 
     isApplyingChanges.value = true;
     try {
@@ -729,7 +784,8 @@ const saveButtonDisabled = computed(() => {
         shareFolder.value !== origShareFolder.value ||
         sharedFolderPath.value !== origSharedFolderPath.value ||
         (!Number.isNaN(freerdpPort.value) && freerdpPort.value !== origFreerdpPort.value) ||
-        autoStartContainer.value !== origAutoStartContainer.value;
+        autoStartContainer.value !== origAutoStartContainer.value ||
+        wbConfig.config.gpuDevice !== origGpuDevice.value;
 
     const shouldBeDisabled = errors.value?.length || !hasResourceChanges || isApplyingChanges.value;
 

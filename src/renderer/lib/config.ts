@@ -72,6 +72,7 @@ export type WinboatConfigObj = {
     containerRuntime: ContainerRuntimes;
     versionData: WinboatVersionData;
     appsSortOrder: string;
+    gpuDevice: string;
 };
 
 const currentVersion = new WinboatVersion(import.meta.env.VITE_APP_VERSION);
@@ -96,6 +97,7 @@ const defaultConfig: WinboatConfigObj = {
         current: currentVersion
     },
     appsSortOrder: 'name',
+    gpuDevice: 'disabled',
 };
 
 export class WinboatConfig {

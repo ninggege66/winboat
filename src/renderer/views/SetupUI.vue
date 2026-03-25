@@ -594,6 +594,31 @@
                                     <x-label>{{ diskSpaceGB }} GB</x-label>
                                 </div>
                             </div>
+
+                            <div v-if="gpuList.length > 0">
+                                <label for="select-gpu" class="text-sm text-neutral-400">选择显卡加速 (3D)</label>
+                                <div class="flex flex-row gap-4 items-center">
+                                    <x-select
+                                        id="select-gpu"
+                                        @change="(e: any) => (gpuDevice = e.detail.newValue)"
+                                        class="w-[50%]"
+                                    >
+                                        <x-menu>
+                                            <x-menuitem value="disabled" :toggled="gpuDevice === 'disabled'">
+                                                <x-label>禁用显卡加速</x-label>
+                                            </x-menuitem>
+                                            <x-menuitem
+                                                v-for="gpu in gpuList"
+                                                :key="gpu.id"
+                                                :value="gpu.path"
+                                                :toggled="gpuDevice === gpu.path"
+                                            >
+                                                <x-label>{{ gpu.name }}</x-label>
+                                            </x-menuitem>
+                                        </x-menu>
+                                    </x-select>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex flex-row gap-4 mt-6">
@@ -699,6 +724,12 @@
                                 <div class="flex flex-col">
                                     <span class="text-sm text-gray-400">安装位置</span>
                                     <span class="text-base text-white">{{ installFolder }}</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-gray-400">显卡加速</span>
+                                    <span class="text-base text-white">
+                                        {{ gpuDevice === 'disabled' ? '已禁用' : (gpuList.find(g => g.path === gpuDevice)?.name || gpuDevice) }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -816,6 +847,7 @@ import {
     getContainerSpecs,
 } from "../lib/containers/common";
 import { WinboatConfig } from "../lib/config";
+import { getGPUList, type GPUInfo } from "../lib/gpu";
 
 const path: typeof import("path") = require("node:path");
 const electron: typeof import("electron") = require("electron").remote || require("@electron/remote");
@@ -927,6 +959,8 @@ const installState = ref<InstallStates>(InstallStates.IDLE);
 const preinstallMsg = ref("");
 const containerRuntime = ref(ContainerRuntimes.DOCKER);
 const vncPort = ref(8006);
+const gpuList = ref<GPUInfo[]>([]);
+const gpuDevice = ref("disabled");
 // These are the install steps where the container is actually up and running
 const linkableInstallSteps = [ InstallStates.MONITORING_PREINSTALL, InstallStates.INSTALLING_WINDOWS, InstallStates.COMPLETED ];
 
@@ -947,6 +981,9 @@ onMounted(async () => {
 
     // Set default shared folder path to home directory
     sharedFolderPath.value = os.homedir();
+
+    gpuList.value = await getGPUList();
+    console.log("GPU List", gpuList.value);
 });
 
 onUnmounted(() => {
@@ -1122,6 +1159,7 @@ function install() {
         username: username.value,
         password: password.value,
         sharedFolderPath: folderSharing.value ? sharedFolderPath.value : undefined,
+        gpuDevice: gpuDevice.value,
         ...(customIsoPath.value ? { customIsoPath: customIsoPath.value } : {}),
         container: containerRuntime.value, // Hardcdde for now
     };

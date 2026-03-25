@@ -45,12 +45,22 @@
             </template>
             <template v-else-if="props.type === 'dropdown'">
                 <x-select
-                    class="w-20"
-                    @change="(e: any) => (value = Number(e.detail.newValue))"
+                    class="w-64"
+                    @change="(e: any) => {
+                        const val = e.detail.newValue;
+                        value = /^\d+$/.test(val) ? Number(val) : val;
+                    }"
                 >
+                    <x-label v-if="hasCustomLabel">
+                        <slot name="custom-label" :option="value">
+                            {{ value }}{{ props.unit ?? '' }}
+                        </slot>
+                    </x-label>
                     <x-menu>
                         <x-menuitem v-for="(opt, key) in props.options" :value="opt" :key="key" :toggled="value === opt">
-                            <x-label>{{ opt }}{{ props.unit ?? '' }}</x-label>
+                            <slot name="custom-label" :option="opt">
+                                <x-label>{{ opt }}{{ props.unit ?? '' }}</x-label>
+                            </slot>
                         </x-menuitem>
                     </x-menu>
                 </x-select>
@@ -68,6 +78,10 @@
 
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import { useSlots } from "vue";
+
+const slots = useSlots();
+const hasCustomLabel = !!slots["custom-label"];
 
 type PropsType = {
     /**

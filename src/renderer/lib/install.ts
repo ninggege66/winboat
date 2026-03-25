@@ -127,6 +127,27 @@ export class InstallManager {
             }
         }
 
+        // GPU mapping
+        if (this.conf.gpuDevice && this.conf.gpuDevice !== "disabled") {
+            if (!composeContent.services.windows.devices) {
+                composeContent.services.windows.devices = ["/dev/kvm"];
+            }
+            if (!composeContent.services.windows.devices.includes(this.conf.gpuDevice)) {
+                composeContent.services.windows.devices.push(this.conf.gpuDevice);
+            }
+            composeContent.services.windows.environment.GPU = "on";
+
+            // If it's not the first render node, it's likely discrete
+            if (this.conf.gpuDevice.includes("renderD129") || this.conf.gpuDevice.includes("renderD130")) {
+                 composeContent.services.windows.environment.DRI_PRIME = "1";
+            }
+
+            logger.info(`Added GPU device: ${this.conf.gpuDevice}`);
+        } else {
+            composeContent.services.windows.environment.GPU = "off";
+            delete composeContent.services.windows.environment.DRI_PRIME;
+        }
+
         // Write the compose file
         this.container.writeCompose(composeContent);
     }
